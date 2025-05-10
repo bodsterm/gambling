@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joke Gambling Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        #balance {
+            font-size: 24px;
+            color: #2ecc71;
+            margin: 20px 0;
+        }
+        .game {
+            margin: 20px 0;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #reset {
+            background-color: #e74c3c;
+        }
+        #reset:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Joke Gambling Site</h1>
+        <p>Welcome to the fake casino! You start with $100 in play money.</p>
+        <div id="balance">Balance: $100</div>
+        
+        <div class="game">
+            <h2>Coin Flip</h2>
+            <label>Bet Amount: <input type="number" id="betAmount" min="1" placeholder="Enter bet"></label><br>
+            <label>Guess: 
+                <select id="guess">
+                    <option value="heads">Heads</option>
+                    <option value="tails">Tails</option>
+                </select>
+            </label><br>
+            <button onclick="playGame()">Flip Coin!</button>
+        </div>
+        <div id="result"></div>
+        <button id="reset" onclick="resetBalance()">Reset Balance to $100</button>
+    </div>
+
+    <script>
+        // Initialize balance
+        let balance = parseFloat(localStorage.getItem('balance')) || 100;
+        updateBalanceDisplay();
+
+        function updateBalanceDisplay() {
+            document.getElementById('balance').textContent = `Balance: $${balance.toFixed(2)}`;
+            localStorage.setItem('balance', balance);
+        }
+
+        function playGame() {
+            const betAmount = parseFloat(document.getElementById('betAmount').value);
+            const guess = document.getElementById('guess').value;
+            const resultDiv = document.getElementById('result');
+
+            // Validate bet
+            if (isNaN(betAmount) || betAmount <= 0) {
+                resultDiv.textContent = "Please enter a valid bet amount.";
+                return;
+            }
+            if (betAmount > balance) {
+                resultDiv.textContent = "You don't have enough money!";
+                return;
+            }
+
+            // Simulate coin flip
+            const coinResult = Math.random() < 0.5 ? 'heads' : 'tails';
+            const won = guess === coinResult;
+
+            // Update balance
+            if (won) {
+                balance += betAmount;
+                resultDiv.textContent = `The coin landed on ${coinResult}! You won $${betAmount.toFixed(2)}!`;
+            } else {
+                balance -= betAmount;
+                resultDiv.textContent = `The coin landed on ${coinResult}. You lost $${betAmount.toFixed(2)}.`;
+            }
+
+            updateBalanceDisplay();
+
+            // Check if broke
+            if (balance <= 0) {
+                resultDiv.textContent += " You're out of money! Reset to start over.";
+            }
+        }
+
+        function resetBalance() {
+            balance = 100;
+            updateBalanceDisplay();
+            document.getElementById('result').textContent = "Balance reset to $100!";
+        }
+    </script>
+</body>
+</html>
